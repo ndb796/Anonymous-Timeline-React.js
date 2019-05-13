@@ -8,9 +8,9 @@ yarn start
 ### Tutorial
 * How to make React App
 ```
-# node.js, yarn, Editor ¼³Ä¡ ÀÌÈÄ Æ¯Á¤ Æú´õ Á¢±Ù
+# node.js, yarn, Editor ì„¤ì¹˜ ì´í›„ íŠ¹ì • í´ë” ì ‘ê·¼
 yarn global add create-react-app
 create-react-app anonymous-timeline-react.js
-# ¸¸µé¾îÁø React App¿¡ Á¢±Ù
+# ë§Œë“¤ì–´ì§„ React Appì— ì ‘ê·¼
 cd anonymous-timeline-react.js
 ```
