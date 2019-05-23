@@ -9,7 +9,10 @@ class App extends React.Component {
     this.state = {
       boards: {},
       searchName: '',
-      searchContent: ''
+      searchContent: '',
+      name: '',
+      content: '',
+      password: '',
     }
   }
   _get() {
@@ -18,7 +21,9 @@ class App extends React.Component {
           throw new Error(res.statusText);
       }
       return res.json();
-    }).then(data => this.setState({boards: data['data']}));
+    }).then(data => {
+      this.setState({boards: data['data']})
+    });
   }
   componentDidMount() {
     this._get();
@@ -41,9 +46,41 @@ class App extends React.Component {
       this.handleSearch();
     }
   }
+  handleSubmit = () => {
+    fetch(`${databaseURL}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        "name": this.state.name,
+        "content": this.state.content,
+        "password": this.state.password
+      })
+    }).then(res => {
+      if(res.status !== 200) {
+          throw new Error(res.statusText);
+      }
+      return res.json();
+    }).then(data => {
+      this.setState({
+        searchName: '',
+        searchContent: '',
+        name: '',
+        content: '',
+        password: ''
+      });
+      this._get();
+    });
+  }
   render() {
     return (
       <div>
+        <div>
+          <textarea type="text" name="content" value={this.state.content} onChange={this.handleValueChange}>
+          </textarea>
+          이름: <input type="text" name="name" value={this.state.name} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
+          비밀번호: <input type="password" name="password" value={this.state.password} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
+          <input type="button" value="작성" onClick={this.handleSubmit}/>
+        </div> 
         이름: <input type="text" name="searchName" value={this.state.searchName} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
         내용: <input type="text" name="searchContent" value={this.state.searchContent} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
         <input type="button" value="검색" onClick={this.handleSearch}/>
