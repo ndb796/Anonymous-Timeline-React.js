@@ -1,0 +1,9 @@
+.card {
+    width: 100%;
+}
+.card-left {
+    width: 80%;
+}
+.card-right {
+    width: 20%;
+}

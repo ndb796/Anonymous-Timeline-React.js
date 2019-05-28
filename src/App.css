@@ -1,5 +1,5 @@
 .container {
-  width: 720px;
+  max-width: 720px;
   margin: 0 auto;
 }
 .write-area {
@@ -8,5 +8,5 @@
 }
 .search-area {
   width: 100%;
-  text-align: left;
+  text-align: center;
 }

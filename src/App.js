@@ -3,17 +3,19 @@ import Board from './components/Board';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { withStyles } from "@material-ui/core/styles";
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography'
 import './App.css';
 
 const databaseURL = "http://localhost:3000/api/board";
 
 const styles = {
-  input1: {
-    height: 50
-  },
-  input2: {
-    height: 200,
-    fontSize: "3em"
+  fab: {
+    
   }
 };
 
@@ -27,6 +29,7 @@ class App extends React.Component {
       name: '',
       content: '',
       password: '',
+      writing: false
     }
   }
   _get() {
@@ -38,6 +41,9 @@ class App extends React.Component {
     }).then(data => {
       this.setState({boards: data['data']})
     });
+  }
+  writingToggle = () => {
+    this.setState({writing: !this.state.writing})
   }
   componentDidMount() {
     this._get();
@@ -82,6 +88,7 @@ class App extends React.Component {
       return res.json();
     }).then(data => {
       this.setState({
+        writing: false,
         searchName: '',
         searchContent: '',
         content: '',
@@ -92,55 +99,76 @@ class App extends React.Component {
   render() {
     return (
       <div className="container">
+        <Fab
+          color={this.state.writing? "secondary" : "primary"}
+          aria-label="Add"
+          className={styles.fab}
+          onClick={this.writingToggle}
+          style={{margin: 10}}>
+            {this.state.writing?
+              <RemoveIcon />:
+              <AddIcon />
+            }
+            
+        </Fab>
+        {this.state.writing && 
         <div className="write-area">
-          <TextField
-            label="이름"
-            type="text"
-            margin="normal"
-            variant="outlined"
-            name="name"
-            value={this.state.name}
-            onChange={this.handleValueChange}
-            onKeyPress={this.handleEnter}
-            style={{marginRight: 10}}
-            inputProps={{style: {height: 15}}}
-          />
-          <TextField
-            label="비밀번호"
-            type="password"
-            margin="normal"
-            variant="outlined"
-            name="password"
-            value={this.state.password}
-            onChange={this.handleValueChange}
-            onKeyPress={this.handleEnter}
-            style={{marginLeft: 10}}
-            inputProps={{style: {height: 15}}}
-          />
-          <TextField
-            label="메시지를 입력하세요."
-            multiline
-            rowsMax="6"
-            name="content"
-            value={this.state.content}
-            onChange={this.handleValueChange}
-            margin="normal"
-            variant="outlined"
-            fullWidth
-            inputProps={{style: {height: 60}}}
-          />
-          <br />
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={this.handleSubmit}
-            style={{margin: 10}}
-            inputProps={{}}>
-            작성
-          </Button>
-          <hr />
+          <Card>
+            <CardContent>
+              <Typography color="primary" variant="h6" style={{marginRight: 10}}>
+                  글쓰기
+              </Typography>
+              <TextField
+                label="이름"
+                type="text"
+                margin="normal"
+                variant="outlined"
+                name="name"
+                value={this.state.name}
+                onChange={this.handleValueChange}
+                onKeyPress={this.handleEnter}
+                style={{marginLeft: 10, marginRight: 10}}
+                inputProps={{style: {height: 15}}}
+              />
+              <TextField
+                label="비밀번호"
+                type="password"
+                margin="normal"
+                variant="outlined"
+                name="password"
+                value={this.state.password}
+                onChange={this.handleValueChange}
+                onKeyPress={this.handleEnter}
+                style={{marginLeft: 10, marginRight: 10}}
+                inputProps={{style: {height: 15}}}
+              />
+              <TextField
+                label="메시지를 입력하세요."
+                multiline
+                rowsMax="6"
+                name="content"
+                value={this.state.content}
+                onChange={this.handleValueChange}
+                margin="normal"
+                variant="outlined"
+                fullWidth
+                inputProps={{style: {height: 60}}}
+              />
+              <br />
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={this.handleSubmit}
+                style={{margin: 10}}
+                inputProps={{}}>
+                작성
+              </Button>
+            </CardContent>
+          </Card>
         </div> 
+        }
         <div className="search-area">
+          <br />
           <TextField
             label="이름"
             type="text"
@@ -150,7 +178,7 @@ class App extends React.Component {
             value={this.state.searchName}
             onChange={this.handleValueChange}
             onKeyPress={this.handleEnter}
-            style={{marginRight: 10}}
+            style={{marginLeft: 10, marginRight: 10}}
             inputProps={{style: {height: 15}}}
           />
           <TextField
@@ -162,15 +190,15 @@ class App extends React.Component {
             value={this.state.searchContent}
             onChange={this.handleValueChange} 
             onKeyPress={this.handleEnter}
-            style={{marginLeft: 10}}
+            style={{marginLeft: 10, marginRight: 10}}
             inputProps={{style: {height: 15}}}
           />
+          <br />
           <Button
             color="primary"
             variant="contained"
             onClick={this.handleSearch}
-            style={{marginTop: 24, marginLeft: 20}}
-            inputProps={{}}>
+            style={{margin: 20}}>
             검색
           </Button>
         </div>
