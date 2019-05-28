@@ -1,14 +1,28 @@
 import React from 'react';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Typography from '@material-ui/core/Typography';
 
 class Board extends React.Component {
     render() {
         return (
-            <div>
-                번호: {this.props.id}<br/>
-                이름: {this.props.name}<br/>
-                내용: {this.props.content}<br/>
-                날짜: {this.props.date}
-            </div>
+            <Card>
+                <CardContent>
+                    <Typography color="textSecondary" gutterbottom>
+                        {this.props.id}
+                    </Typography>
+                    <Typography variant="h5" component="h2">
+                        {this.props.content}
+                    </Typography>
+                    <Typography color="textSecondary" gutterbottom>
+                        {this.props.content}
+                    </Typography>
+                    <Typography color="textSecondary" gutterbottom>
+                        {this.props.date}
+                    </Typography>
+                </CardContent>
+            </Card>
         );
     }
 }

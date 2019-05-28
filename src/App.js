@@ -1,5 +1,8 @@
 import React from 'react';
 import Board from './components/Board';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import './App.css';
 
 const databaseURL = "http://localhost:3000/api/board";
 
@@ -64,29 +67,87 @@ class App extends React.Component {
       this.setState({
         searchName: '',
         searchContent: '',
-        name: '',
         content: '',
-        password: ''
       });
       this._get();
     });
   }
   render() {
     return (
-      <div>
-        <div>
-          <textarea type="text" name="content" value={this.state.content} onChange={this.handleValueChange}>
-          </textarea>
-          이름: <input type="text" name="name" value={this.state.name} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
-          비밀번호: <input type="password" name="password" value={this.state.password} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
-          <input type="button" value="작성" onClick={this.handleSubmit}/>
+      <div className="container">
+        <div className="write-area">
+          <TextField
+            label="이름"
+            type="text"
+            margin="normal"
+            variant="outlined"
+            name="name"
+            value={this.state.name}
+            onChange={this.handleValueChange}
+            onKeyPress={this.handleEnter}
+          />
+          <TextField
+            label="비밀번호"
+            type="password"
+            margin="normal"
+            variant="outlined"
+            name="password"
+            value={this.state.password}
+            onChange={this.handleValueChange}
+            onKeyPress={this.handleEnter}
+            style={{marginRight: 20}}
+          />
+          <TextField
+            label="메시지를 입력하세요."
+            multiline
+            rowsMax="6"
+            name="content"
+            value={this.state.content}
+            onChange={this.handleValueChange}
+            margin="normal"
+            variant="outlined"
+            fullWidth
+          />
+          <br />
+          <Button variant="contained" onClick={this.handleSubmit}>
+            작성
+          </Button>
+          <hr />
         </div> 
-        이름: <input type="text" name="searchName" value={this.state.searchName} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
-        내용: <input type="text" name="searchContent" value={this.state.searchContent} onChange={this.handleValueChange} onKeyPress={this.handleEnter}/>
-        <input type="button" value="검색" onClick={this.handleSearch}/>
+        <div className="search-area">
+          <TextField
+            label="이름"
+            type="text"
+            margin="normal"
+            variant="outlined"
+            name="searchName"
+            value={this.state.searchName}
+            onChange={this.handleValueChange}
+            onKeyPress={this.handleEnter}
+          />
+          <TextField
+            label="내용"
+            type="text"
+            margin="normal"
+            variant="outlined"
+            name="searchContent"
+            value={this.state.searchContent}
+            onChange={this.handleValueChange} 
+            onKeyPress={this.handleEnter}
+            style={{marginRight: 20}}
+          />
+          <Button variant="contained" onClick={this.handleSearch}>
+            검색
+          </Button>
+        </div>
         {Object.keys(this.state.boards).map(id => {
           let board = this.state.boards[id];
-          return <Board key={board.id} id={board.id} name={board.name} content={board.content} date={board.date}/>
+          return (
+            <div>
+              <Board key={board.id} id={board.id} name={board.name} content={board.content} date={board.date}/>
+              <br/>
+            </div>
+          )
         })}
       </div>
     );
