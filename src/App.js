@@ -2,9 +2,20 @@ import React from 'react';
 import Board from './components/Board';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { withStyles } from "@material-ui/core/styles";
 import './App.css';
 
 const databaseURL = "http://localhost:3000/api/board";
+
+const styles = {
+  input1: {
+    height: 50
+  },
+  input2: {
+    height: 200,
+    fontSize: "3em"
+  }
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -50,6 +61,12 @@ class App extends React.Component {
     }
   }
   handleSubmit = () => {
+    if(!this.state.name ||
+       !this.state.content ||
+       !this.state.password) {
+       alert('이름과 비밀번호 및 메시지 내용을 모두 넣어주세요.');
+       return;
+    }
     fetch(`${databaseURL}`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -85,6 +102,8 @@ class App extends React.Component {
             value={this.state.name}
             onChange={this.handleValueChange}
             onKeyPress={this.handleEnter}
+            style={{marginRight: 10}}
+            inputProps={{style: {height: 15}}}
           />
           <TextField
             label="비밀번호"
@@ -95,7 +114,8 @@ class App extends React.Component {
             value={this.state.password}
             onChange={this.handleValueChange}
             onKeyPress={this.handleEnter}
-            style={{marginRight: 20}}
+            style={{marginLeft: 10}}
+            inputProps={{style: {height: 15}}}
           />
           <TextField
             label="메시지를 입력하세요."
@@ -107,9 +127,15 @@ class App extends React.Component {
             margin="normal"
             variant="outlined"
             fullWidth
+            inputProps={{style: {height: 60}}}
           />
           <br />
-          <Button variant="contained" onClick={this.handleSubmit}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={this.handleSubmit}
+            style={{margin: 10}}
+            inputProps={{}}>
             작성
           </Button>
           <hr />
@@ -124,6 +150,8 @@ class App extends React.Component {
             value={this.state.searchName}
             onChange={this.handleValueChange}
             onKeyPress={this.handleEnter}
+            style={{marginRight: 10}}
+            inputProps={{style: {height: 15}}}
           />
           <TextField
             label="내용"
@@ -134,12 +162,19 @@ class App extends React.Component {
             value={this.state.searchContent}
             onChange={this.handleValueChange} 
             onKeyPress={this.handleEnter}
-            style={{marginRight: 20}}
+            style={{marginLeft: 10}}
+            inputProps={{style: {height: 15}}}
           />
-          <Button variant="contained" onClick={this.handleSearch}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={this.handleSearch}
+            style={{marginTop: 24, marginLeft: 20}}
+            inputProps={{}}>
             검색
           </Button>
         </div>
+        <br />
         {Object.keys(this.state.boards).map(id => {
           let board = this.state.boards[id];
           return (
@@ -154,4 +189,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withStyles(styles)(App);
