@@ -1,12 +1,8 @@
 import React from 'react';
-import Fab from '@material-ui/core/Fab';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography'
-import UpdateIcon from '@material-ui/icons/Update';
-import RemoveIcon from '@material-ui/icons/Remove';
-import { withStyles } from '@material-ui/core/styles';
 import DialogContent from '@material-ui/core/DialogContent';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -14,12 +10,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
-const styles = theme => ({
-    fab: {
-    
-    },
-});
-    
+const databaseURL = "http://localhost:3000/api/board";
+
 class Board extends React.Component {
     constructor(props) {
         super(props);
@@ -27,7 +19,8 @@ class Board extends React.Component {
             updateDialog: false,
             deleteDialog: false,
             content: '',
-            password: ''
+            password: '',
+            message: ''
         }
     }
     func(date, time) {
@@ -46,15 +39,39 @@ class Board extends React.Component {
     })
     handleDeleteDialogToggle = () => this.setState({
         deleteDialog: !this.state.deleteDialog,
-        password: ''
+        password: '',
+        message: ''
     })
     handleValueChange = (e) => {
         let nextState = {};
         nextState[e.target.name] = e.target.value;
         this.setState(nextState);
     }
+    handleDeleteSubmit = () => {
+        this._delete(this.props.id, this.state.password);
+    }
+    _delete(id, password) {
+        return fetch(`${databaseURL}/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'password': password 
+            }
+        }).then(res => {
+            if(res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+            return res.json();
+        }).then(data => {
+            if(data['success'] === false) {
+                this.setState({message : data['data']});
+            } else {
+                this.handleDeleteDialogToggle();
+                this.props.stateRefresh();
+            }
+        });
+    }
     render() {
-        const { classes } = this.props;
         return (
             <div>
                 <Card>
@@ -130,10 +147,12 @@ class Board extends React.Component {
                             fullWidth
                             variant="outlined"/>
                         <br/>
+                        <br/>
+                        {this.state.message}
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" color="primary" onClick={this.handleDeleteSubmit}>
-                            수정
+                            삭제
                         </Button>
                         <Button variant="outlined" color="primary" onClick={this.handleDeleteDialogToggle}>닫기</Button>
                     </DialogActions>
@@ -143,4 +162,4 @@ class Board extends React.Component {
     }
 }
 
-export default withStyles(styles)(Board);
+export default Board;

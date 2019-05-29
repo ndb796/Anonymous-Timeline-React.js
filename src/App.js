@@ -2,7 +2,6 @@ import React from 'react';
 import Board from './components/Board';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { withStyles } from "@material-ui/core/styles";
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -12,12 +11,6 @@ import Typography from '@material-ui/core/Typography'
 import './App.css';
 
 const databaseURL = "http://localhost:3000/api/board";
-
-const styles = {
-  fab: {
-    
-  }
-};
 
 class App extends React.Component {
   constructor(props) {
@@ -96,13 +89,20 @@ class App extends React.Component {
       this._get();
     });
   }
+  stateRefresh = () => {
+    this.setState({
+      boards: {},
+      searchName: '',
+      searchContent: '',
+    })
+    this.handleSearch();
+  }
   render() {
     return (
       <div className="container">
         <Fab
           color={this.state.writing? "secondary" : "primary"}
           aria-label="Add"
-          className={styles.fab}
           onClick={this.writingToggle}
           style={{margin: 10}}>
             {this.state.writing?
@@ -206,8 +206,8 @@ class App extends React.Component {
         {Object.keys(this.state.boards).map(id => {
           let board = this.state.boards[id];
           return (
-            <div>
-              <Board key={board.id} id={board.id} name={board.name} content={board.content} date={board.date}/>
+            <div key={id}>
+              <Board stateRefresh={this.stateRefresh} key={board.id} id={board.id} name={board.name} content={board.content} date={board.date}/>
               <br/>
             </div>
           )
@@ -217,4 +217,4 @@ class App extends React.Component {
   }
 }
 
-export default withStyles(styles)(App);
+export default App;

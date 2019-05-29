@@ -17,5 +17,5 @@ cd anonymous-timeline-react.js
 * Design
 ```
 yarn add @material-ui/core@next
-yarn add @material-ui/icon
+yarn add @material-ui/icons
 ```
