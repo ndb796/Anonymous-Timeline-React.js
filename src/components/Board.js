@@ -18,7 +18,8 @@ class Board extends React.Component {
         this.state = {
             updateDialog: false,
             deleteDialog: false,
-            content: '',
+            content: this.props.content,
+            name: this.props.name,
             password: '',
             message: ''
         }
@@ -47,8 +48,37 @@ class Board extends React.Component {
         nextState[e.target.name] = e.target.value;
         this.setState(nextState);
     }
+    handleUpdateSubmit = () => {
+        this._put(this.props.id, this.state.name, this.state.content, this.state.password, this.state.password);
+    }
     handleDeleteSubmit = () => {
         this._delete(this.props.id, this.state.password);
+    }
+    _put(id, name, content, currentPassword, newPassword) {
+        return fetch(`${databaseURL}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'password': currentPassword
+            },
+            body: JSON.stringify({
+                "name": name,
+                "content": content,
+                "password": newPassword
+            })
+        }).then(res => {
+            if(res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+            return res.json();
+        }).then(data => {
+            if(data['success'] === false) {
+                this.setState({message : data['data']});
+            } else {
+                this.handleUpdateDialogToggle();
+                this.props.stateRefresh();
+            }
+        });
     }
     _delete(id, password) {
         return fetch(`${databaseURL}/${id}`, {
@@ -80,7 +110,9 @@ class Board extends React.Component {
                             {this.props.name}
                         </Typography>
                         <Typography>
-                            {this.props.content}
+                            {this.props.content.split('\n').map(line => {
+                                return (<span>{line}<br/></span>);
+                            })}
                         </Typography>
                         <Typography color="textSecondary">
                             {this.func(this.props.date.split('T')[0], this.props.date.split('T')[1].split('.')[0])}
@@ -117,7 +149,7 @@ class Board extends React.Component {
                             variant="outlined"/>
                         <br/><br/>
                         <TextField
-                            label="비밀번호"
+                            label="현재 비밀번호"
                             type="password"
                             name="password"
                             value={this.state.password}
@@ -126,6 +158,8 @@ class Board extends React.Component {
                             fullWidth
                             variant="outlined"/>
                         <br/>
+                        <br/>
+                        {this.state.message}
                     </DialogContent>
                     <DialogActions>
                         <Button variant="contained" color="primary" onClick={this.handleUpdateSubmit}>
