@@ -8,6 +8,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography'
+import CircularProgress from '@material-ui/core/CircularProgress';
 import './App.css';
 
 const databaseURL = "http://localhost:3000/api/board";
@@ -16,15 +17,33 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      boards: {},
+      boards: [],
       searchName: '',
       searchContent: '',
       name: '',
       content: '',
       password: '',
-      writing: false
+      writing: false,
+      lastId: -1,
+      loading: false,
+      searched: false
     }
   }
+  handleScroll = () => {
+    const { innerHeight } = window;
+    const { scrollHeight } = document.body;
+    // IE에서는 document.documentElement를 사용합니다.
+    const scrollTop =
+      (document.documentElement && document.documentElement.scrollTop) ||
+      document.body.scrollTop;
+    // 브라우저의 아래 쪽에 도달했을 때 새롭게 데이터를 불러옵니다.
+    if (scrollHeight - innerHeight - scrollTop < 100) {
+      if(!this.state.loading && !this.state.searched) {
+        this.setState({loading: true});
+        this._get_next();
+      }
+    }
+  };
   _get() {
     fetch(`${databaseURL}`).then(res => {
       if(res.status !== 200) {
@@ -32,7 +51,42 @@ class App extends React.Component {
       }
       return res.json();
     }).then(data => {
-      this.setState({boards: data['data']})
+      let newBoards = [];
+      for (let key in data['data']) {
+        if (data['data'].hasOwnProperty(key)) {
+          newBoards.push(data['data'][key]);
+        }
+      }
+      let last = data['data'][(data['data'].length - 1)];
+      this.setState({boards: newBoards, lastId: last['id'], searched: false});
+    });
+  }
+  _get_next() {
+    fetch(`${databaseURL}?id=${this.state.lastId - 1}`).then(res => {
+      if(res.status !== 200) {
+          throw new Error(res.statusText);
+      }
+      return res.json();
+    }).then(data => {
+      if(this.state.lastId <= 0) {
+        this.setState({loading: false});
+        return;
+      }
+      // 가져 올 데이터가 있다면, 추가하고 lastId를 마지막 값으로 변경합니다.
+      if(data['data'].length > 0) {
+        let newBoards = this.state.boards;
+        for (let key in data['data']) {
+          if (data['data'].hasOwnProperty(key)) {
+            newBoards.push(data['data'][key]);
+          }
+        }
+        let last = data['data'][(data['data'].length - 1)];
+        this.setState({boards: newBoards, lastId: last['id'], loading: false})
+      } else {
+        // 가져 올 데이터가 없다면, lastId를 줄인 뒤에 다시 불러옵니다.
+        this.setState({lastId: this.state.lastId - 5});
+        this._get_next();
+      }
     });
   }
   writingToggle = () => {
@@ -40,14 +94,26 @@ class App extends React.Component {
   }
   componentDidMount() {
     this._get();
+    // 스크롤링 이벤트 추가
+    window.addEventListener("scroll", this.handleScroll);
   }
+  componentWillUnmount() {
+    // 언마운트 될때에, 스크롤링 이벤트 제거
+    window.removeEventListener("scroll", this.handleScroll);
+  }  
   handleSearch = () => {
+    // 아무 입력도 없이, 검색 버튼을 누른 경우 get() 함수 호출
+    if(this.state.searchName === '' && this.state.searchContent === '') {
+      this._get();
+      return;
+    }
+    // 검색 키워드를 입력하여 검색한 경우 검색 수행
     fetch(`${databaseURL}?name=${this.state.searchName}&content=${this.state.searchContent}`).then(res => {
       if(res.status !== 200) {
           throw new Error(res.statusText);
       }
       return res.json();
-    }).then(data => this.setState({boards: data['data']}));
+    }).then(data => this.setState({boards: data['data'], searched: true}));
   }
   handleValueChange = (e) => {
     let nextState = {};
@@ -212,6 +278,10 @@ class App extends React.Component {
             </div>
           )
         })}
+        <div style={{textAlign: 'center'}}>
+          {this.state.searched && "검색 결과를 모두 불러왔습니다."} 
+          {this.state.lastId > 0 && this.state.loading && <CircularProgress />}
+        </div>
       </div>
     );
   }
